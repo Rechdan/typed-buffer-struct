@@ -1,0 +1,10 @@
+
+# files
+yarn*
+debug*
+
+# folders
+.next
+build
+dist
+node_modules
