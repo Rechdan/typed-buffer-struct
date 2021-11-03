@@ -38,15 +38,15 @@ const structBigNumber: StructBigNumber = (builder, size, name, type) => {
   return createStruct(builder, size + bigNumbersSize[type]) as never;
 };
 
-const structString: StructString = (builder, size, name, length) => {
+const structString: StructString = (builder, size, name, strLength) => {
   builder.push((obj, buffer) => {
     Object.defineProperty(obj, name, {
-      get: () => readStringBuffer(buffer, size, length),
-      set: (value: string) => writeStringBuffer(buffer, size, length, value),
+      get: () => readStringBuffer(buffer, size, strLength),
+      set: (value: string) => writeStringBuffer(buffer, size, strLength, value),
       enumerable: true,
     });
   });
-  return createStruct(builder, size + length) as never;
+  return createStruct(builder, size + strLength) as never;
 };
 
 const structStruct: StructStruct = (builder, size, name, struct) => {
@@ -62,12 +62,12 @@ const structStruct: StructStruct = (builder, size, name, struct) => {
 
 // ARRAY RELATED
 
-const arrayNumberFunction: BuildArrayResponseNumberFunction = (length, type) => {
+const arrayNumberFunction: BuildArrayResponseNumberFunction = (arrLength, type) => {
   const numberSize = numbersSize[type];
   return {
-    size: numberSize * length,
+    size: numberSize * arrLength,
     builder: (arr, buffer) => {
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < arrLength; i++) {
         Object.defineProperty(arr, i, {
           get: () => readNumberBuffer(buffer, numberSize * i, type),
           set: (value: number) => writeNumberBuffer(buffer, numberSize * i, type, value),
@@ -79,12 +79,12 @@ const arrayNumberFunction: BuildArrayResponseNumberFunction = (length, type) => 
   };
 };
 
-const arrayBigNumberFunction: BuildArrayResponseBigNumberFunction = (length, type) => {
+const arrayBigNumberFunction: BuildArrayResponseBigNumberFunction = (arrLength, type) => {
   const numberSize = bigNumbersSize[type];
   return {
-    size: numberSize * length,
+    size: numberSize * arrLength,
     builder: (arr, buffer) => {
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < arrLength; i++) {
         Object.defineProperty(arr, i, {
           get: () => readBigNumberBuffer(buffer, numberSize * i, type),
           set: (value: bigint) => writeBigNumberBuffer(buffer, numberSize * i, type, value),
@@ -98,12 +98,12 @@ const arrayBigNumberFunction: BuildArrayResponseBigNumberFunction = (length, typ
 
 const buildArray: BuildArray = () => ({
   // arrays
-  array: (length, build) => {
+  array: (arrLength, build) => {
     const { size: buildSize, builder: buildBuilder } = build(buildArray());
     return {
-      size: buildSize * length,
+      size: buildSize * arrLength,
       builder: (arr, buffer) => {
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < arrLength; i++) {
           const arr2 = buildBuilder([], buffer.slice(buildSize * i, buildSize * (i + 1)));
           Object.defineProperty(arr, i, {
             get: () => arr2,
@@ -115,20 +115,20 @@ const buildArray: BuildArray = () => ({
     };
   },
   // numbers
-  sbyte: (length) => arrayNumberFunction(length, "sbyte"),
-  byte: (length) => arrayNumberFunction(length, "byte"),
-  short: (length) => arrayNumberFunction(length, "short"),
-  ushort: (length) => arrayNumberFunction(length, "ushort"),
-  int: (length) => arrayNumberFunction(length, "int"),
-  uint: (length) => arrayNumberFunction(length, "uint"),
+  sbyte: (arrLength) => arrayNumberFunction(arrLength, "sbyte"),
+  byte: (arrLength) => arrayNumberFunction(arrLength, "byte"),
+  short: (arrLength) => arrayNumberFunction(arrLength, "short"),
+  ushort: (arrLength) => arrayNumberFunction(arrLength, "ushort"),
+  int: (arrLength) => arrayNumberFunction(arrLength, "int"),
+  uint: (arrLength) => arrayNumberFunction(arrLength, "uint"),
   // big numbers
-  long: (length) => arrayBigNumberFunction(length, "long"),
-  ulong: (length) => arrayBigNumberFunction(length, "ulong"),
+  long: (arrLength) => arrayBigNumberFunction(arrLength, "long"),
+  ulong: (arrLength) => arrayBigNumberFunction(arrLength, "ulong"),
   // extras
   string: (arrLength, stringLength) => ({
     size: arrLength * stringLength,
     builder: (arr, buffer) => {
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < arrLength; i++) {
         Object.defineProperty(arr, i, {
           get: () => readStringBuffer(buffer, stringLength * i, stringLength),
           set: (value: string) => writeStringBuffer(buffer, stringLength * i, stringLength, value),
@@ -138,10 +138,10 @@ const buildArray: BuildArray = () => ({
       return arr;
     },
   }),
-  struct: (length, struct) => ({
-    size: length * struct.size,
+  struct: (arrLength, struct) => ({
+    size: arrLength * struct.size,
     builder: (arr, buffer) => {
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < arrLength; i++) {
         const structObj = struct(buffer.slice(i * struct.size, (i + 1) * struct.size));
         Object.defineProperty(arr, i, {
           get: () => structObj,

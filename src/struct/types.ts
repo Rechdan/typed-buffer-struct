@@ -41,19 +41,19 @@ export type BuildArrayResponseBigNumberFunction = (length: number, type: BigNumb
 
 export type BuildArrayResponse = {
   // numbers
-  sbyte: (length: number) => BuildArrayResponseNumberResult;
-  byte: (length: number) => BuildArrayResponseNumberResult;
-  short: (length: number) => BuildArrayResponseNumberResult;
-  ushort: (length: number) => BuildArrayResponseNumberResult;
-  int: (length: number) => BuildArrayResponseNumberResult;
-  uint: (length: number) => BuildArrayResponseNumberResult;
+  sbyte: (arrLength: number) => BuildArrayResponseNumberResult;
+  byte: (arrLength: number) => BuildArrayResponseNumberResult;
+  short: (arrLength: number) => BuildArrayResponseNumberResult;
+  ushort: (arrLength: number) => BuildArrayResponseNumberResult;
+  int: (arrLength: number) => BuildArrayResponseNumberResult;
+  uint: (arrLength: number) => BuildArrayResponseNumberResult;
   // big number
-  long: (length: number) => BuildArrayResponseBigNumberResult;
-  ulong: (length: number) => BuildArrayResponseBigNumberResult;
+  long: (arrLength: number) => BuildArrayResponseBigNumberResult;
+  ulong: (arrLength: number) => BuildArrayResponseBigNumberResult;
   // extra
-  array: <T>(length: number, build: ArrayBuilder<T>) => ArrayBuilderResponse<T[]>;
+  array: <T>(arrLength: number, build: ArrayBuilder<T>) => ArrayBuilderResponse<T[]>;
   string: (arrLength: number, stringLength: number) => ArrayBuilderResponse<string[]>;
-  struct: <T>(length: number, struct: BuildStructResult<T>) => ArrayBuilderResponse<T[]>;
+  struct: <T>(arrLength: number, struct: BuildStructResult<T>) => ArrayBuilderResponse<T[]>;
 };
 
 export type BuildArray = () => BuildArrayResponse;
