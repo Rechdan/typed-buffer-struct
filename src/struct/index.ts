@@ -52,6 +52,7 @@ const structString: StructString = (builder, size, name, strLength) => {
 const structStruct: StructStruct = (builder, size, name, struct) => {
   builder.push((obj, buffer) => {
     const structObj = struct(buffer.slice(size, size + struct.size));
+    delete (structObj as { buffer: unknown }).buffer;
     Object.defineProperty(obj, name, {
       get: () => structObj,
       enumerable: true,
@@ -143,6 +144,7 @@ const buildArray: BuildArray = () => ({
     builder: (arr, buffer) => {
       for (let i = 0; i < arrLength; i++) {
         const structObj = struct(buffer.slice(i * struct.size, (i + 1) * struct.size));
+        delete (structObj as { buffer: unknown }).buffer;
         Object.defineProperty(arr, i, {
           get: () => structObj,
           enumerable: true,
