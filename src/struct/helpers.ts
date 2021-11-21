@@ -65,5 +65,5 @@ export const readStringBuffer: ReadStringBuffer = (buffer, offset, length) => {
 };
 
 export const writeStringBuffer: WriteStringBuffer = (buffer, offset, length, value) => {
-  buffer.write(value, offset, offset + length, "latin1");
+  buffer.fill(0, offset, offset + length, "latin1").write(value, offset, offset + length, "latin1");
 };
