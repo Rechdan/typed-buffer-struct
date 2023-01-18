@@ -41,24 +41,30 @@ export type BuildArrayResponseBigNumberFunction = (length: number, type: BigNumb
 
 export type BuildArrayResponse = {
   // numbers
-  sbyte: (arrLength: number) => BuildArrayResponseNumberResult;
-  byte: (arrLength: number) => BuildArrayResponseNumberResult;
-  short: (arrLength: number) => BuildArrayResponseNumberResult;
-  ushort: (arrLength: number) => BuildArrayResponseNumberResult;
-  int: (arrLength: number) => BuildArrayResponseNumberResult;
-  uint: (arrLength: number) => BuildArrayResponseNumberResult;
+  sbyte: () => BuildArrayResponseNumberResult;
+  byte: () => BuildArrayResponseNumberResult;
+  short: () => BuildArrayResponseNumberResult;
+  ushort: () => BuildArrayResponseNumberResult;
+  int: () => BuildArrayResponseNumberResult;
+  uint: () => BuildArrayResponseNumberResult;
   // big number
-  long: (arrLength: number) => BuildArrayResponseBigNumberResult;
-  ulong: (arrLength: number) => BuildArrayResponseBigNumberResult;
+  long: () => BuildArrayResponseBigNumberResult;
+  ulong: () => BuildArrayResponseBigNumberResult;
   // extra
   array: <T>(arrLength: number, build: ArrayBuilder<T>) => ArrayBuilderResponse<T[]>;
-  string: (arrLength: number, stringLength: number) => ArrayBuilderResponse<string[]>;
-  struct: <T>(arrLength: number, struct: BuildStructResult<T>) => ArrayBuilderResponse<T[]>;
+  string: (stringLength: number) => ArrayBuilderResponse<string[]>;
+  struct: <T>(struct: BuildStructResult<T>) => ArrayBuilderResponse<T[]>;
 };
 
-export type BuildArray = () => BuildArrayResponse;
+export type BuildArray = (length: number) => BuildArrayResponse;
 
-export type StructArray = <T, T2, N extends string>(builder: Builder[], size: number, name: N, build: ArrayBuilder<T2>) => CreateStructResultOf<T, T2, N>;
+export type StructArray = <T, T2, N extends string>(
+  builder: Builder[],
+  size: number,
+  name: N,
+  arrLength: number,
+  build: ArrayBuilder<T2>
+) => CreateStructResultOf<T, T2, N>;
 
 // STRUCT
 
@@ -83,7 +89,7 @@ export type CreateStructResult<T> = {
   // extras
   string: <N extends string>(name: N, length: number) => CreateStructResultOf<T, string, N>;
   struct: <T2, N extends string>(name: N, struct: BuildStructResult<T2>) => CreateStructResultOf<T, T2, N>;
-  array: <T2, N extends string>(name: N, build: ArrayBuilder<T2[]>) => CreateStructResultOf<T, T2[], N>;
+  array: <T2, N extends string>(name: N, arrLength: number, build: ArrayBuilder<T2[]>) => CreateStructResultOf<T, T2[], N>;
   offset: (length: number) => CreateStructResult<T>;
   // build
   build: () => BuildStructResult<{ [K in keyof T]: T[K] }>;
