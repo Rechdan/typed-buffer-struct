@@ -51,7 +51,7 @@ const structString: StructString = (builder, size, name, strLength) => {
 
 const structStruct: StructStruct = (builder, size, name, struct) => {
   builder.push((obj, buffer) => {
-    const structObj = struct(buffer.slice(size, size + struct.size));
+    const structObj = struct(buffer.subarray(size, size + struct.size));
     delete (structObj as { buffer: unknown }).buffer;
     Object.defineProperty(obj, name, {
       get: () => structObj,
@@ -97,15 +97,15 @@ const arrayBigNumberFunction: BuildArrayResponseBigNumberFunction = (arrLength, 
   };
 };
 
-const buildArray: BuildArray = () => ({
+const buildArray: BuildArray = (arrLength) => ({
   // arrays
-  array: (arrLength, build) => {
-    const { size: buildSize, builder: buildBuilder } = build(buildArray());
+  array: (arrLength2, build) => {
+    const { size: buildSize, builder: buildBuilder } = build(buildArray(arrLength2));
     return {
       size: buildSize * arrLength,
       builder: (arr, buffer) => {
         for (let i = 0; i < arrLength; i++) {
-          const arr2 = buildBuilder([], buffer.slice(buildSize * i, buildSize * (i + 1)));
+          const arr2 = buildBuilder([], buffer.subarray(buildSize * i, buildSize * (i + 1)));
           Object.defineProperty(arr, i, {
             get: () => arr2,
             enumerable: true,
@@ -116,17 +116,17 @@ const buildArray: BuildArray = () => ({
     };
   },
   // numbers
-  sbyte: (arrLength) => arrayNumberFunction(arrLength, "sbyte"),
-  byte: (arrLength) => arrayNumberFunction(arrLength, "byte"),
-  short: (arrLength) => arrayNumberFunction(arrLength, "short"),
-  ushort: (arrLength) => arrayNumberFunction(arrLength, "ushort"),
-  int: (arrLength) => arrayNumberFunction(arrLength, "int"),
-  uint: (arrLength) => arrayNumberFunction(arrLength, "uint"),
+  sbyte: () => arrayNumberFunction(arrLength, "sbyte"),
+  byte: () => arrayNumberFunction(arrLength, "byte"),
+  short: () => arrayNumberFunction(arrLength, "short"),
+  ushort: () => arrayNumberFunction(arrLength, "ushort"),
+  int: () => arrayNumberFunction(arrLength, "int"),
+  uint: () => arrayNumberFunction(arrLength, "uint"),
   // big numbers
-  long: (arrLength) => arrayBigNumberFunction(arrLength, "long"),
-  ulong: (arrLength) => arrayBigNumberFunction(arrLength, "ulong"),
+  long: () => arrayBigNumberFunction(arrLength, "long"),
+  ulong: () => arrayBigNumberFunction(arrLength, "ulong"),
   // extras
-  string: (arrLength, stringLength) => ({
+  string: (stringLength) => ({
     size: arrLength * stringLength,
     builder: (arr, buffer) => {
       for (let i = 0; i < arrLength; i++) {
@@ -139,11 +139,11 @@ const buildArray: BuildArray = () => ({
       return arr;
     },
   }),
-  struct: (arrLength, struct) => ({
+  struct: (struct) => ({
     size: arrLength * struct.size,
     builder: (arr, buffer) => {
       for (let i = 0; i < arrLength; i++) {
-        const structObj = struct(buffer.slice(i * struct.size, (i + 1) * struct.size));
+        const structObj = struct(buffer.subarray(i * struct.size, (i + 1) * struct.size));
         delete (structObj as { buffer: unknown }).buffer;
         Object.defineProperty(arr, i, {
           get: () => structObj,
@@ -155,10 +155,10 @@ const buildArray: BuildArray = () => ({
   }),
 });
 
-const structArray: StructArray = (builder, size, name, build) => {
-  const { size: buildSize, builder: buildBuilder } = build(buildArray());
+const structArray: StructArray = (builder, size, name, arrLength, build) => {
+  const { size: buildSize, builder: buildBuilder } = build(buildArray(arrLength));
   builder.push((obj, buffer) => {
-    const arr = buildBuilder([], buffer.slice(size, buildSize + size));
+    const arr = buildBuilder([], buffer.subarray(size, buildSize + size));
     Object.defineProperty(obj, name, {
       get: () => arr,
       enumerable: true,
@@ -183,7 +183,7 @@ const createStruct: CreateStruct<{}> = (builder = [], size = 0) => ({
   // extras
   string: (name, length) => structString(builder, size, name, length),
   struct: (name, struct) => structStruct(builder, size, name, struct),
-  array: (name, build) => structArray(builder, size, name, build),
+  array: (name, arrLength, build) => structArray(builder, size, name, arrLength, build),
   offset: (length) => createStruct(builder, size + length),
   // build
   build: () => {

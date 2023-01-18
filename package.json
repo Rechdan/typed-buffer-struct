@@ -1,6 +1,6 @@
 {
   "name": "typed-buffer-struct",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "This is a package which helps the user to create a Struct with automatic Buffer creation.",
   "author": {
     "name": "Nelson Faiçal Rechdan",
@@ -13,18 +13,22 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "upgrade": "clear && ncu -t greatest -f \"/eslint/\" -u && ncu -u && yarn --check-files",
-    "build": "ttsc && rm -rf \"./dist\" && mv \"./temp\" \"./dist\"",
-    "pub:alpha": "clear && yarn run build && npm publish --tag alpha --access public"
+    "upgrade": "ncu -u && yarn --check-files",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "ttsc && rm -rf \"./dist\" && mv \"./temp\" \"./dist\""
   },
   "devDependencies": {
-    "@types/node": "16.11.9",
-    "@typescript-eslint/eslint-plugin": "5.4.1-alpha.18",
-    "@typescript-eslint/parser": "5.4.1-alpha.18",
-    "eslint": "8.3.0",
-    "ttypescript": "1.5.12",
-    "typescript": "4.5.2",
-    "typescript-transform-paths": "3.3.1"
+    "@types/jest": "29.2.5",
+    "@types/node": "18.11.18",
+    "@typescript-eslint/eslint-plugin": "5.48.2",
+    "@typescript-eslint/parser": "5.48.2",
+    "eslint": "8.32.0",
+    "jest": "29.3.1",
+    "ts-jest": "29.0.5",
+    "ttypescript": "1.5.15",
+    "typescript": "4.9.4",
+    "typescript-transform-paths": "3.4.6"
   },
   "files": [
     "package.json",
