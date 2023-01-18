@@ -21,7 +21,7 @@ const sCharacter = newStruct()
   .build(); // total of 24 bytes
 
 const sAccount = newStruct()
-  /* 0 to 95 */ .array("characters", (b) => b.struct(4, sCharacter))
+  /* 0 to 95 */ .array("characters", 4, (b) => b.struct(sCharacter))
   .build(); // total of 96 bytes
 
 // now, lets create a new account
@@ -43,7 +43,3 @@ OUTPUT:
 (here I divided the output in 4 sections, just to show the 4 characters in the account)
 */
 ```
-
-## Tests
-
-Tests will be added upon the v1 release
