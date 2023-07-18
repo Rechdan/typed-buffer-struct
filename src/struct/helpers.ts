@@ -60,10 +60,10 @@ export const writeBigNumberBuffer: WriteBigNumberBuffer = (buffer, offset, type,
   }
 };
 
-export const readStringBuffer: ReadStringBuffer = (buffer, offset, length) => {
-  return buffer.toString("latin1", offset, offset + length).replaceAll("\0", "");
+export const readStringBuffer: ReadStringBuffer = (buffer, offset, length, encoding) => {
+  return buffer.toString(encoding, offset, offset + length).replaceAll("\0", "");
 };
 
-export const writeStringBuffer: WriteStringBuffer = (buffer, offset, length, value) => {
-  buffer.fill(0, offset, offset + length, "latin1").write(value, offset, offset + length, "latin1");
+export const writeStringBuffer: WriteStringBuffer = (buffer, offset, length, encoding, value) => {
+  buffer.fill(0, offset, offset + length, encoding).write(value, offset, offset + length, encoding);
 };

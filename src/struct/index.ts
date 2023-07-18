@@ -38,11 +38,11 @@ const structBigNumber: StructBigNumber = (builder, size, name, type) => {
   return createStruct(builder, size + bigNumbersSize[type]) as never;
 };
 
-const structString: StructString = (builder, size, name, strLength) => {
+const structString: StructString = (builder, size, name, strLength, encoding) => {
   builder.push((obj, buffer) => {
     Object.defineProperty(obj, name, {
-      get: () => readStringBuffer(buffer, size, strLength),
-      set: (value: string) => writeStringBuffer(buffer, size, strLength, value),
+      get: () => readStringBuffer(buffer, size, strLength, encoding),
+      set: (value: string) => writeStringBuffer(buffer, size, strLength, encoding, value),
       enumerable: true,
     });
   });
@@ -126,13 +126,13 @@ const buildArray: BuildArray = (arrLength) => ({
   long: () => arrayBigNumberFunction(arrLength, "long"),
   ulong: () => arrayBigNumberFunction(arrLength, "ulong"),
   // extras
-  string: (stringLength) => ({
+  string: (stringLength, encoding = "latin1") => ({
     size: arrLength * stringLength,
     builder: (arr, buffer) => {
       for (let i = 0; i < arrLength; i++) {
         Object.defineProperty(arr, i, {
-          get: () => readStringBuffer(buffer, stringLength * i, stringLength),
-          set: (value: string) => writeStringBuffer(buffer, stringLength * i, stringLength, value),
+          get: () => readStringBuffer(buffer, stringLength * i, stringLength, encoding),
+          set: (value: string) => writeStringBuffer(buffer, stringLength * i, stringLength, encoding, value),
           enumerable: true,
         });
       }
@@ -181,7 +181,7 @@ const createStruct: CreateStruct<{}> = (builder = [], size = 0) => ({
   long: (name) => structBigNumber(builder, size, name, "long"),
   ulong: (name) => structBigNumber(builder, size, name, "ulong"),
   // extras
-  string: (name, length) => structString(builder, size, name, length),
+  string: (name, length, encoding = "latin1") => structString(builder, size, name, length, encoding),
   struct: (name, struct) => structStruct(builder, size, name, struct),
   array: (name, arrLength, build) => structArray(builder, size, name, arrLength, build),
   offset: (length) => createStruct(builder, size + length),

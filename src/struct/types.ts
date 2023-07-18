@@ -12,14 +12,23 @@ export type ReadNumberBuffer = (buffer: Buffer, offset: number, type: Numbers) =
 export type WriteNumberBuffer = (buffer: Buffer, offset: number, type: Numbers, value: number) => void;
 export type ReadBigNumberBuffer = (buffer: Buffer, offset: number, type: BigNumbers) => bigint;
 export type WriteBigNumberBuffer = (buffer: Buffer, offset: number, type: BigNumbers, value: bigint) => void;
-export type ReadStringBuffer = (buffer: Buffer, offset: number, length: number) => string;
-export type WriteStringBuffer = (buffer: Buffer, offset: number, length: number, value: string) => void;
+export type ReadStringBuffer = (buffer: Buffer, offset: number, length: number, encoding: BufferEncoding) => string;
+export type WriteStringBuffer = (buffer: Buffer, offset: number, length: number, encoding: BufferEncoding, value: string) => void;
 
 // STRUCT RELATED
 
 export type StructNumber = <T, N extends string>(builder: Builder[], size: number, name: N, type: Numbers) => CreateStructResultOf<T, number, N>;
+
 export type StructBigNumber = <T, N extends string>(builder: Builder[], size: number, name: N, type: BigNumbers) => CreateStructResultOf<T, bigint, N>;
-export type StructString = <T, N extends string>(builder: Builder[], size: number, name: N, length: number) => CreateStructResultOf<T, string, N>;
+
+export type StructString = <T, N extends string>(
+  builder: Builder[],
+  size: number,
+  name: N,
+  length: number,
+  encoding: BufferEncoding
+) => CreateStructResultOf<T, string, N>;
+
 export type StructStruct = <T, T2, N extends string>(
   builder: Builder[],
   size: number,
@@ -52,7 +61,7 @@ export type BuildArrayResponse = {
   ulong: () => BuildArrayResponseBigNumberResult;
   // extra
   array: <T>(arrLength: number, build: ArrayBuilder<T>) => ArrayBuilderResponse<T[]>;
-  string: (stringLength: number) => ArrayBuilderResponse<string[]>;
+  string: (stringLength: number, encoding?: BufferEncoding) => ArrayBuilderResponse<string[]>;
   struct: <T>(struct: BuildStructResult<T>) => ArrayBuilderResponse<T[]>;
 };
 
@@ -87,7 +96,7 @@ export type CreateStructResult<T> = {
   long: <N extends string>(name: N) => CreateStructResultOf<T, bigint, N>;
   ulong: <N extends string>(name: N) => CreateStructResultOf<T, bigint, N>;
   // extras
-  string: <N extends string>(name: N, length: number) => CreateStructResultOf<T, string, N>;
+  string: <N extends string>(name: N, length: number, encoding?: BufferEncoding) => CreateStructResultOf<T, string, N>;
   struct: <T2, N extends string>(name: N, struct: BuildStructResult<T2>) => CreateStructResultOf<T, T2, N>;
   array: <T2, N extends string>(name: N, arrLength: number, build: ArrayBuilder<T2[]>) => CreateStructResultOf<T, T2[], N>;
   offset: (length: number) => CreateStructResult<T>;
